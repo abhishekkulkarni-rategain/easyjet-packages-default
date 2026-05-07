@@ -99,7 +99,6 @@ def load_dummy_data():
 df = load_dummy_data()
 
 # --- SIDEBAR FILTERS ---
-st.sidebar.image("https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/EasyJet_logo.svg/2560px-EasyJet_logo.svg.png", width=150)
 st.sidebar.markdown("### Global Filters")
 
 # Shop Date Filter (For Trendlines)
@@ -141,7 +140,7 @@ else:
 available_df = f_df[f_df['Status'] != 'Not Available']
 
 # --- DASHBOARD HEADER ---
-st.title("Packages Analytics-as-a-Service (AaaS)")
+st.title("EastJet Packages Analytics")
 st.markdown("Evaluating EasyJet's packaged competitiveness. *Note: 'Meet' defined as within ±2.5% of market lowest.*")
 
 # --- TAB SETUP ---
