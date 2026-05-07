@@ -144,8 +144,8 @@ else:
 available_df = f_df[f_df['Status'] != 'Not Available']
 
 # --- DASHBOARD HEADER ---
-st.title("EasyJet Packages Analytics")
-st.markdown("Evaluating EasyJet's packaged competitiveness. *Note: 'Meet' defined as within ±2.5% of market lowest.*")
+st.title("Packages Analytics")
+st.markdown("Evaluating packaged competitiveness. *Note: 'Meet' defined as within ±2.5% of market lowest.*")
 
 # --- TAB SETUP ---
 tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
@@ -217,8 +217,8 @@ with tab2:
 
 # --- TAB 3: AVAILABILITY GAP ---
 with tab3:
-    st.subheader("Availability Parity: Packages Missing from EasyJet")
-    st.markdown("These packages returned competitor prices but yielded no result (or 'Closed' status) from EasyJet.")
+    st.subheader("Availability Parity: Packages Missing")
+    st.markdown("These packages returned competitor prices but yielded no result (or 'Closed' status)")
     
     oos_df = f_df[f_df['Status'] == 'Not Available']
     
@@ -237,7 +237,7 @@ with tab3:
         st.markdown("#### Log of Missing Inventory")
         st.dataframe(oos_df[['Shop_Date', 'Departure_Date', 'Origin_Airport', 'Destination_Airport', 'Hotel', 'Occupancy', 'Market_Lowest']], use_container_width=True)
     else:
-        st.success("No availability gaps found for the current filter selection! EasyJet is present on all packages.")
+        st.success("No availability gaps found for the current filter selection! Present on all packages.")
 
 # --- TAB 4: MARGIN OPTIMIZATION ---
 with tab4:
