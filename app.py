@@ -76,18 +76,18 @@ def load_dummy_data():
     df = pd.DataFrame(data, columns=[
         'Shop_Date', 'Origin_Airport', 'Destination_Airport', 'Destination_Country', 
         'Departure_Date', 'Inbound_Date', 'LOS', 'Hotel', 'Star_Rating', 'Occupancy', 'Airline',
-        'EasyJet', 'Comp_1', 'Comp_2', 'Comp_3', 'Comp_4', 
+        'Client', 'Comp_1', 'Comp_2', 'Comp_3', 'Comp_4', 
         'EJ_Flight_Duration', 'Mkt_Flight_Duration'
     ])
     
     # --- CORE PARITY LOGIC ---
     df['Market_Lowest'] = df[['Comp_1', 'Comp_2', 'Comp_3', 'Comp_4']].min(axis=1)
-    df['Price_Variance'] = df['EasyJet'] - df['Market_Lowest']
+    df['Price_Variance'] = df['Client'] - df['Market_Lowest']
     df['Variance_Percent'] = (df['Price_Variance'] / df['Market_Lowest']) * 100
     df['Duration_Variance'] = df['EJ_Flight_Duration'] - df['Mkt_Flight_Duration']
     
     def determine_status(row):
-        if pd.isna(row['EasyJet']): return 'Not Available'
+        if pd.isna(row['Client']): return 'Not Available'
         pct = row['Variance_Percent']
         if pct < -2.5: return 'Win'
         elif -2.5 <= pct <= 2.5: return 'Meet'
@@ -195,7 +195,7 @@ with tab2:
         'Total_Shops': len(x),
         'Win_Rate_Pct': (len(x[x['Status'] == 'Win']) / len(x[x['Status'] != 'Not Available']) * 100) if len(x[x['Status'] != 'Not Available']) > 0 else 0,
         'Avg_Lowest_Market_Price': x['Market_Lowest'].mean(),
-        'Avg_EasyJet_Price': x['EasyJet'].mean()
+        'Avg_Client_Price': x['Client'].mean()
     })).reset_index()
 
     col_t1, col_t2 = st.columns(2)
@@ -206,7 +206,7 @@ with tab2:
         st.plotly_chart(fig_trend_win, use_container_width=True)
         
     with col_t2:
-        fig_trend_price = px.line(daily_metrics, x='Shop_Date', y=['Avg_EasyJet_Price', 'Avg_Lowest_Market_Price'], markers=True,
+        fig_trend_price = px.line(daily_metrics, x='Shop_Date', y=['Avg_Client_Price', 'Avg_Lowest_Market_Price'], markers=True,
                                   title="Average Price Trend (£)", labels={'value': 'Average Price (£)', 'variable': 'Metric'})
         st.plotly_chart(fig_trend_price, use_container_width=True)
 
@@ -243,7 +243,7 @@ with tab3:
 with tab4:
     col_box, col_los = st.columns(2)
     with col_box:
-        melted_df = available_df.melt(id_vars=['Destination_Country'], value_vars=['EasyJet', 'Comp_1', 'Comp_2', 'Comp_3', 'Comp_4'], 
+        melted_df = available_df.melt(id_vars=['Destination_Country'], value_vars=['Client', 'Comp_1', 'Comp_2', 'Comp_3', 'Comp_4'], 
                                       var_name='Brand', value_name='Price')
         fig_spread = px.violin(melted_df, x='Destination_Country', y='Price', color='Brand', 
                                box=True, points="all", title="Package Price Clustering & Density")
@@ -277,7 +277,7 @@ with tab6:
     # Selecting the most relevant columns for display so the table isn't overwhelmingly wide
     display_cols = [
         'Shop_Date', 'Departure_Date', 'Inbound_Date', 'LOS', 'Origin_Airport', 'Destination_Airport', 
-        'Hotel', 'Star_Rating', 'Occupancy', 'Airline', 'EasyJet', 'Market_Lowest', 'Status', 
+        'Hotel', 'Star_Rating', 'Occupancy', 'Airline', 'Client', 'Market_Lowest', 'Status', 
         'Variance_Percent', 'Price_Variance'
     ]
     st.dataframe(f_df[display_cols], use_container_width=True)
