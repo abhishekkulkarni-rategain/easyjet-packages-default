@@ -115,10 +115,13 @@ dep_range = st.sidebar.date_input("Travel Departure Date", value=(min_dep, max_d
 st.sidebar.markdown("### Package Dimensions")
 sel_airline = st.sidebar.multiselect("Airline", options=df['Airline'].unique(), default=df['Airline'].unique())
 sel_occ = st.sidebar.multiselect("Occupancy", options=df['Occupancy'].unique(), default=df['Occupancy'].unique())
+
+# Reintegrated Hotel & Star Filters
+sel_hotel = st.sidebar.multiselect("Hotels", options=df['Hotel'].unique(), default=df['Hotel'].unique())
 sel_star = st.sidebar.multiselect("Hotel Star Rating", options=sorted(df['Star_Rating'].unique()), default=sorted(df['Star_Rating'].unique()))
 
-# Existing Geo/Hotel Filters
-st.sidebar.markdown("### Geography & Product")
+# Existing Geo Filters
+st.sidebar.markdown("### Geography")
 sel_country = st.sidebar.multiselect("Destination Country", options=df['Destination_Country'].unique(), default=df['Destination_Country'].unique())
 sel_origin = st.sidebar.multiselect("Origin Airport", options=df['Origin_Airport'].unique(), default=df['Origin_Airport'].unique())
 sel_dest = st.sidebar.multiselect("Destination Airport", options=df['Destination_Airport'].unique(), default=df['Destination_Airport'].unique())
@@ -129,7 +132,8 @@ if len(shop_range) == 2 and len(dep_range) == 2:
     f_df = df[
         (df['Shop_Date'] >= shop_range[0]) & (df['Shop_Date'] <= shop_range[1]) &
         (df['Departure_Date'] >= dep_range[0]) & (df['Departure_Date'] <= dep_range[1]) &
-        (df['Airline'].isin(sel_airline)) & (df['Occupancy'].isin(sel_occ)) & (df['Star_Rating'].isin(sel_star)) &
+        (df['Airline'].isin(sel_airline)) & (df['Occupancy'].isin(sel_occ)) & 
+        (df['Star_Rating'].isin(sel_star)) & (df['Hotel'].isin(sel_hotel)) &
         (df['Destination_Country'].isin(sel_country)) & (df['Origin_Airport'].isin(sel_origin)) &
         (df['Destination_Airport'].isin(sel_dest)) & (df['LOS'].isin(sel_los))
     ]
@@ -140,16 +144,17 @@ else:
 available_df = f_df[f_df['Status'] != 'Not Available']
 
 # --- DASHBOARD HEADER ---
-st.title("EastJet Packages Analytics")
+st.title("EasyJet Packages Analytics")
 st.markdown("Evaluating EasyJet's packaged competitiveness. *Note: 'Meet' defined as within ±2.5% of market lowest.*")
 
 # --- TAB SETUP ---
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "1. Executive Parity", 
     "2. Trendlines & Pivot", 
     "3. Availability Gap", 
     "4. Margin & Distributions", 
-    "5. Attribution Matrix"
+    "5. Attribution Matrix",
+    "6. Raw Data Log"
 ])
 
 # --- TAB 1: EXECUTIVE PARITY ---
@@ -186,7 +191,6 @@ with tab1:
 with tab2:
     st.subheader("Time-Series Market Position (DoD / WoW)")
     
-    # Calculate daily metrics
     daily_metrics = f_df.groupby('Shop_Date').apply(lambda x: pd.Series({
         'Total_Shops': len(x),
         'Win_Rate_Pct': (len(x[x['Status'] == 'Win']) / len(x[x['Status'] != 'Not Available']) * 100) if len(x[x['Status'] != 'Not Available']) > 0 else 0,
@@ -222,7 +226,7 @@ with tab3:
         col_o1, col_o2 = st.columns(2)
         with col_o1:
             fig_oos_geo = px.histogram(oos_df, y="Destination_Airport", color="LOVEHOLIDAYSPKG", 
-                                       title="Missed Opportunities by Destination (Colored by LHP Price)",
+                                       title="Missed Opportunities by Destination",
                                        category_orders={"Destination_Airport": oos_df['Destination_Airport'].value_counts().index})
             st.plotly_chart(fig_oos_geo, use_container_width=True)
             
@@ -264,3 +268,16 @@ with tab5:
     fig_scatter.add_vline(x=0, line_width=2, line_dash="dash", line_color="black")
     fig_scatter.add_hline(y=0, line_width=2, line_dash="dash", line_color="black")
     st.plotly_chart(fig_scatter, use_container_width=True)
+
+# --- TAB 6: RAW DATA LOG ---
+with tab6:
+    st.subheader("Raw Intelligence Log")
+    st.markdown("Line-by-line breakdown of the filtered dataset for auditing and specific query lookups.")
+    
+    # Selecting the most relevant columns for display so the table isn't overwhelmingly wide
+    display_cols = [
+        'Shop_Date', 'Departure_Date', 'Inbound_Date', 'LOS', 'Origin_Airport', 'Destination_Airport', 
+        'Hotel', 'Star_Rating', 'Occupancy', 'Airline', 'EasyJet', 'Market_Lowest', 'Status', 
+        'Variance_Percent', 'Price_Variance'
+    ]
+    st.dataframe(f_df[display_cols], use_container_width=True)
