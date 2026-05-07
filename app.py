@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 from datetime import datetime, timedelta
 
 # --- PAGE CONFIGURATION ---
-st.set_page_config(page_title="EasyJet Package Insights POC", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Package Insights POC", layout="wide", initial_sidebar_state="expanded")
 
 # --- DUMMY DATA GENERATOR ---
 @st.cache_data
@@ -55,7 +55,7 @@ def load_dummy_data():
         # Pricing
         base = np.random.randint(800, 2500)
         
-        # Inject Availability Parity (EasyJet is Out of Stock/Not Available ~10% of the time)
+        # Inject Availability Parity (Out of Stock/Not Available ~10% of the time)
         is_oos = np.random.random() < 0.10
         ej_price = np.nan if is_oos else base + np.random.randint(-150, 150)
         
