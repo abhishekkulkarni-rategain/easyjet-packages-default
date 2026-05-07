@@ -23,7 +23,7 @@ def load_dummy_data():
     }
     
     hotels = ['Ambrosia Hotel', 'Waldorf Astoria', 'InterContinental', 'Jasmin Beach', 'Anantara Resort']
-    competitors = ['LOVEHOLIDAYSPKG', 'ONTHEBEACHPACKAGE', 'Expedia', 'Booking']
+    competitors = ['Comp_1', 'Comp_2', 'Comp_3', 'Comp_4']
     airlines = ['U2 (EasyJet)', 'FR (Ryanair)', 'BA (British Airways)', 'TK (Turkish)']
     occupancies = ['2 Adults', '1 Adult', '2 Adults + 1 Child', '2 Adults + 2 Children']
     star_ratings = [3, 4, 5]
@@ -68,20 +68,20 @@ def load_dummy_data():
         row = [
             shop_date, geo['Origin'], geo['Dest'], geo['Country'], dep_date.date(), ret_date.date(), los, 
             hotel, star, occ, airline,
-            ej_price, prices['LOVEHOLIDAYSPKG'], prices['ONTHEBEACHPACKAGE'], 
-            prices['Expedia'], prices['Booking'], ej_dur, mkt_dur
+            ej_price, prices['Comp_1'], prices['Comp_2'], 
+            prices['Comp_3'], prices['Comp_4'], ej_dur, mkt_dur
         ]
         data.append(row)
         
     df = pd.DataFrame(data, columns=[
         'Shop_Date', 'Origin_Airport', 'Destination_Airport', 'Destination_Country', 
         'Departure_Date', 'Inbound_Date', 'LOS', 'Hotel', 'Star_Rating', 'Occupancy', 'Airline',
-        'EasyJet', 'LOVEHOLIDAYSPKG', 'ONTHEBEACHPACKAGE', 'Expedia', 'Booking', 
+        'EasyJet', 'Comp_1', 'Comp_2', 'Comp_3', 'Comp_4', 
         'EJ_Flight_Duration', 'Mkt_Flight_Duration'
     ])
     
     # --- CORE PARITY LOGIC ---
-    df['Market_Lowest'] = df[['LOVEHOLIDAYSPKG', 'ONTHEBEACHPACKAGE', 'Expedia', 'Booking']].min(axis=1)
+    df['Market_Lowest'] = df[['Comp_1', 'Comp_2', 'Comp_3', 'Comp_4']].min(axis=1)
     df['Price_Variance'] = df['EasyJet'] - df['Market_Lowest']
     df['Variance_Percent'] = (df['Price_Variance'] / df['Market_Lowest']) * 100
     df['Duration_Variance'] = df['EJ_Flight_Duration'] - df['Mkt_Flight_Duration']
@@ -225,7 +225,7 @@ with tab3:
     if not oos_df.empty:
         col_o1, col_o2 = st.columns(2)
         with col_o1:
-            fig_oos_geo = px.histogram(oos_df, y="Destination_Airport", color="LOVEHOLIDAYSPKG", 
+            fig_oos_geo = px.histogram(oos_df, y="Destination_Airport", color="Comp_1", 
                                        title="Missed Opportunities by Destination",
                                        category_orders={"Destination_Airport": oos_df['Destination_Airport'].value_counts().index})
             st.plotly_chart(fig_oos_geo, use_container_width=True)
@@ -243,7 +243,7 @@ with tab3:
 with tab4:
     col_box, col_los = st.columns(2)
     with col_box:
-        melted_df = available_df.melt(id_vars=['Destination_Country'], value_vars=['EasyJet', 'LOVEHOLIDAYSPKG', 'ONTHEBEACHPACKAGE', 'Expedia', 'Booking'], 
+        melted_df = available_df.melt(id_vars=['Destination_Country'], value_vars=['EasyJet', 'Comp_1', 'Comp_2', 'Comp_3', 'Comp_4'], 
                                       var_name='Brand', value_name='Price')
         fig_spread = px.violin(melted_df, x='Destination_Country', y='Price', color='Brand', 
                                box=True, points="all", title="Package Price Clustering & Density")
