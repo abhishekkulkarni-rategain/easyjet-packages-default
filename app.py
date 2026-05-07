@@ -165,7 +165,7 @@ with tab1:
     oos_rate = (len(f_df[f_df['Status'] == 'Not Available']) / len(f_df)) * 100 if len(f_df) > 0 else 0
     
     col1, col2, col3, col4 = st.columns(4)
-    col1.metric("EasyJet Win Rate (Available)", f"{win_rate:.1f}%")
+    col1.metric("Win Rate (Available)", f"{win_rate:.1f}%")
     col2.metric("Availability Gap (OOS)", f"{oos_rate:.1f}%", delta="Missed Revenue", delta_color="inverse")
     col3.metric("Avg £ Gap (Losses)", f"£{available_df[available_df['Status'] == 'Loss']['Price_Variance'].mean():.2f}")
     col4.metric("Avg £ Margin (Wins)", f"£{abs(available_df[available_df['Status'] == 'Win']['Price_Variance'].mean()):.2f}")
